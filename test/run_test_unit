@@ -3,10 +3,10 @@
 source "$(dirname "${BASH_SOURCE[0]}")/common_functions.sh"
 
 
-declare -r root_dir="$(relpath $1)"; shift;
+declare -r app_name="$1"; shift;
 declare -r app_dir="$(relpath $1)"; shift;
+declare -r root_dir="$(relpath $1)"; shift;
 
-declare -r app_name="mx_test"
 
 
 # Run cunit tests

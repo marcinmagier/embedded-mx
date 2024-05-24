@@ -48,8 +48,7 @@ cmake: cmake_debug \
 
 test: test_unit
 
-report: report_unit \
-        report_fat
+report: report_test_unit
 
 debug:     build_debug
 release:   build_release
@@ -111,6 +110,7 @@ ifeq ($(SANITIZE),1)
 endif
 
 	cmake \
+		-DCMAKE_PROJECT_NAME=$(PROJECT) \
 		-DCMAKE_BUILD_TARGET=$(TARGET) \
 		-DCMAKE_BUILD_VARIANT=$(VARIANT) \
 		-DCMAKE_FIND_ROOT_PATH="$(EXTLIB_DIR)" \
@@ -131,7 +131,7 @@ dir_%:
 
 run_%:
 	$(eval VARIANT := $(subst run_,,$@))
-	test/run_$(VARIANT) "$(ROOT_DIR)" "$(BUILD_T_DIR)/$(VARIANT)"
+	test/run_$(VARIANT) "$(PROJECT)_test" "$(BUILD_T_DIR)/$(VARIANT)" "$(ROOT_DIR)"
 	echo ""
 
 
@@ -196,7 +196,6 @@ help:
 
 deps:
 	sudo apt update
-	sudo apt install clang clang-tools lcov
+	sudo apt install clang clang-tools lcov uncrustify
 	sudo apt install libcunit1-dev
-	sudo apt install libjson-c-dev
 

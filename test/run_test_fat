@@ -3,8 +3,9 @@
 source "$(dirname "${BASH_SOURCE[0]}")/common_functions.sh"
 
 
-declare -r root_dir="$(relpath $1)"; shift;
+declare -r app_name="$(relpath $1)"; shift;
 declare -r app_dir="$(relpath $1)"; shift;
+declare -r root_dir="$(relpath $1)"; shift;
 
 declare -r build_dir="$root_dir/build_$(uname -m)"
 declare -r test_robot_dir="$root_dir/test/robot"

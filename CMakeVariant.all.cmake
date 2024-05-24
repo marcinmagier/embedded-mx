@@ -7,7 +7,7 @@ include(build_utils)
 include(build_flags_sections)
 
 
-set(PRJ_LIB_NAME        cmx_lib)
+set(PRJ_LIB_NAME        mx_lib)
 set(PRJ_LIB_OUT_NAME    mx)
 
 set(PRJ_LIB_VER_MAJOR   0)
@@ -16,7 +16,6 @@ set(PRJ_LIB_VER_PATCH   0)
 
 
 # find external libs
-find_library(EXT_LIB_JSON_PATH              "json-c")
 
 
 # add subdirectories
@@ -70,10 +69,10 @@ set_target_properties(${PRJ_LIB_NAME}_shared PROPERTIES
 
 # private defines
 set_private_defines(${PRJ_LIB_NAME})
+# filename defines
+set_filename_defines(${PRJ_LIB_NAME}_objs)
 
 # link libraries
-target_link_libraries(${PRJ_LIB_NAME}_static ${EXT_LIB_JSON_PATH})
-target_link_libraries(${PRJ_LIB_NAME}_shared ${EXT_LIB_JSON_PATH})
 
 # install
 install(TARGETS ${PRJ_LIB_NAME}_static  DESTINATION "lib")

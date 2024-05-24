@@ -1,5 +1,5 @@
 
-cmake_minimum_required(VERSION 2.8.11)
+cmake_minimum_required(VERSION 2.8.12)
 
 # Project
 set(CMAKE_PROJECT_NAME "main" CACHE STRING "Default main project name")
