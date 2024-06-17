@@ -8,19 +8,41 @@
 
 
 
+#ifndef RINGBUF_LEN_SIZE
+  #define RINGBUF_LEN_SIZE      1
+#endif
+
+#if RINGBUF_LEN_SIZE == 1
+  typedef uint8_t   ringbuf_len_t;
+#elif RINGBUF_LEN_SIZE == 2
+  typedef uint16_t  ringbuf_len_t;
+#else
+  typedef uint32_t  ringbuf_len_t;
+#endif
+
+
+
+
+
 struct ringbuf {
   volatile uint8_t *data;
-  uint8_t mask;
+  ringbuf_len_t mask;
 
-  volatile uint8_t put_ptr;
-  volatile uint8_t get_ptr;
+  volatile ringbuf_len_t put_idx;
+  volatile ringbuf_len_t get_idx;
 };
 
-void    ringbuf_init(struct ringbuf *self, uint8_t *buffer, uint8_t size);
-bool    ringbuf_put(struct ringbuf *self, uint8_t c);
-bool    ringbuf_get(struct ringbuf *self, uint8_t *c);
-uint8_t ringbuf_size(struct ringbuf *self);
-uint8_t ringbuf_elements(struct ringbuf *self);
+
+
+void ringbuf_init(struct ringbuf *self, uint8_t *buffer, ringbuf_len_t size);
+bool ringbuf_put(struct ringbuf *self, uint8_t c);
+bool ringbuf_get(struct ringbuf *self, uint8_t *c);
+
+ringbuf_len_t ringbuf_size(struct ringbuf *self);
+ringbuf_len_t ringbuf_elements(struct ringbuf *self);
+
+bool ringbuf_is_empty(struct ringbuf *self);
+bool ringbuf_is_full(struct ringbuf *self);
 
 
 #endif /* __MX_RINGBUF_H_ */

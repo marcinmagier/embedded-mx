@@ -5,34 +5,36 @@
 
 
 
-#define ACCESS_ONCE_U8(x) (*(volatile uint8_t *)&(x))
+#define ACCESS_ONCE_DATA(x) (*(volatile uint8_t *)&(x))
+#define ACCESS_ONCE_IDX(x) (*(volatile ringbuf_len_t *)&(x))
 
 
 
-void ringbuf_init(struct ringbuf *self, uint8_t *buffer, uint8_t size)
+void ringbuf_init(struct ringbuf *self, uint8_t *buffer, ringbuf_len_t size)
 {
-  self->data = buffer;
-  self->mask = size - 1;
-  self->put_ptr = 0;
-  self->get_ptr = 0;
+    self->data = buffer;
+    self->mask = size - 1;
+    self->put_idx = 0;
+    self->get_idx = 0;
 }
 
 
 bool ringbuf_put(struct ringbuf *self, uint8_t c)
 {
-    if(((self->put_ptr - self->get_ptr) & self->mask) == self->mask)
-      return false;
+    if (ringbuf_is_full(self))
+        return false;
 
-    ACCESS_ONCE_U8(self->data[self->put_ptr]) = c;
-    ACCESS_ONCE_U8(self->put_ptr) = (self->put_ptr + 1) & self->mask;
+    ACCESS_ONCE_DATA(self->data[self->put_idx]) = c;
+    ACCESS_ONCE_IDX(self->put_idx) = (self->put_idx + 1) & self->mask;
     return true;
 }
 
+
 bool ringbuf_get(struct ringbuf *self, uint8_t *c)
 {
-    if(((self->put_ptr - self->get_ptr) & self->mask) > 0) {
-        *c = ACCESS_ONCE_U8(self->data[self->get_ptr]);
-        ACCESS_ONCE_U8(self->get_ptr) = (self->get_ptr + 1) & self->mask;
+    if (!ringbuf_is_empty(self)) {
+        *c = ACCESS_ONCE_DATA(self->data[self->get_idx]);
+        ACCESS_ONCE_IDX(self->get_idx) = (self->get_idx + 1) & self->mask;
         return true;
     }
 
@@ -40,13 +42,25 @@ bool ringbuf_get(struct ringbuf *self, uint8_t *c)
 }
 
 
-uint8_t ringbuf_size(struct ringbuf *self)
+ringbuf_len_t ringbuf_size(struct ringbuf *self)
 {
     return self->mask + 1;
 }
 
 
-uint8_t ringbuf_elements(struct ringbuf *self)
+ringbuf_len_t ringbuf_elements(struct ringbuf *self)
 {
-  return (self->put_ptr - self->get_ptr) & self->mask;
+    return (self->put_idx - self->get_idx) & self->mask;
+}
+
+
+bool ringbuf_is_empty(struct ringbuf *self)
+{
+    return (ringbuf_elements(self) == 0);
+}
+
+
+bool ringbuf_is_full(struct ringbuf *self)
+{
+    return (ringbuf_elements(self) == self->mask);
 }
